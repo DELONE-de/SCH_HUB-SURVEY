@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1E40AF">
+    <meta name="description" content="Campus Student App Research & Feature Validation Survey">
+    <title>Campus App Survey</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+
+    <!-- Main Container -->
+    <div class="container" id="app">
+        
+        <!-- Landing Screen -->
+        <div class="screen active" id="landing">
+            <div class="landing-content">
+                <div class="logo">
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                        <rect width="60" height="60" rx="12" fill="url(#gradient)"/>
+                        <path d="M30 15L45 25V40L30 50L15 40V25L30 15Z" fill="white" opacity="0.9"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0" y1="0" x2="60" y2="60">
+                                <stop offset="0%" stop-color="#3B82F6"/>
+                                <stop offset="100%" stop-color="#1E40AF"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                
+                <h1 class="landing-title">Campus Student App Survey</h1>
+                <p class="landing-subtitle">Research & Feature Validation</p>
+                
+                <div class="info-card">
+                    <div class="info-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>3–5 minutes</span>
+                    </div>
+                    <div class="info-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 11l3 3L22 4"></path>
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                        </svg>
+                        <span>30 questions</span>
+                    </div>
+                </div>
+
+                <p class="landing-description">
+                    Help us build a campus app that actually solves student problems. 
+                    Your honest feedback shapes features that matter.
+                </p>
+
+                <button class="btn btn-primary btn-large" onclick="startSurvey()">
+                    Start Survey
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+
+                <p class="privacy-note">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0110 0v4"></path>
+                    </svg>
+                    Your responses are anonymous and secure
+                </p>
+            </div>
+        </div>
+
+        <!-- Survey Screen -->
+        <div class="screen" id="survey">
+            <!-- Progress Header -->
+            <div class="progress-header">
+                <div class="progress-info">
+                    <span class="progress-text">Section <span id="currentSection">1</span> of 6</span>
+                    <span class="progress-percent" id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Survey Content -->
+            <div class="survey-content" id="surveyContent">
+                <!-- Sections will be injected here -->
+            </div>
+
+            <!-- Navigation -->
+            <div class="survey-nav">
+                <button class="btn btn-secondary" id="prevBtn" onclick="prevSection()" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Previous
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextSection()">
+                    Next
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div class="screen" id="success">
+            <div class="success-content">
+                <div class="success-icon">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                
+                <h2 class="success-title">Thank You! 🎉</h2>
+                <p class="success-message">
+                    Your feedback has been submitted successfully. 
+                    You're helping build a better campus experience for students.
+                </p>
+
+                <div class="success-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="responseCount">247</span>
+                        <span class="stat-label">Total Responses</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">3</span>
+                        <span class="stat-label">Minutes Saved</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="location.reload()">
+                    Take Another Survey
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <p>Submitting your responses...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
