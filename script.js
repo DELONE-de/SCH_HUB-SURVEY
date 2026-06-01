@@ -5,7 +5,7 @@
 
 // Configuration
 const CONFIG = {
-    API_URL: 'https://script.google.com/macros/s/AKfycbykxmceCBl24s-fy_FSoS7UnVuB701e1uea6uipB1nVFTAZW7i_0j5yMgd4CW9dRvJL7w/exec',
+    API_URL: 'https://script.google.com/macros/s/AKfycbx1JaLaAL6aY38oA2hfXuVtDYGOyrWO8bX79gupkdTYkGDOIfV7yvaVZ9onPKG6_M0wjg/exec',
     STORAGE_KEY: 'surveyProgress',
     AUTO_SAVE_INTERVAL: 5000, // 5 seconds
 };
@@ -73,9 +73,15 @@ let autoSaveTimer = null;
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
-    loadProgress();
+    const hasSaved = loadProgress();
     setupAutoSave();
     renderSurvey();
+    if (hasSaved) {
+        startTime = Date.now();
+        showScreen('survey');
+        renderSection();
+        updateProgress();
+    }
 });
 
 // ============================================
@@ -143,7 +149,7 @@ function prevSection() {
 }
 
 function scrollToTop() {
-    document.querySelector('.survey-content')?.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ============================================
@@ -197,16 +203,17 @@ function saveProgress() {
 
 function loadProgress() {
     const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
-    
     if (saved) {
         try {
             const { data, sectionIndex } = JSON.parse(saved);
             Object.assign(surveyData, data);
             currentSectionIndex = sectionIndex || 0;
+            return true;
         } catch (e) {
             console.error('Failed to load progress:', e);
         }
     }
+    return false;
 }
 
 function clearProgress() {
@@ -1014,39 +1021,35 @@ function saveCurrentSection() {
 
 async function submitSurvey() {
     surveyData.timestamp = new Date().toISOString();
-    surveyData.completionTime = Math.round((Date.now() - startTime) / 1000); // seconds
-    
+    surveyData.completionTime = Math.round((Date.now() - startTime) / 1000);
+
     showLoading(true);
-    
+    console.log('[Survey] Submitting to:', CONFIG.API_URL);
+    console.log('[Survey] Payload:', JSON.stringify(surveyData));
+
     try {
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(surveyData));
+
+        console.log('[Survey] Sending fetch request...');
         const response = await fetch(CONFIG.API_URL, {
             method: 'POST',
             mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(surveyData)
+            body: formData
         });
-        
-        // Due to no-cors mode, we can't read the response
-        // Assume success after a short delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
+
+        // no-cors returns opaque response — we can't read it, but no error = request was sent
+        console.log('[Survey] Fetch completed. Response type:', response.type, '| Status:', response.status);
+
         clearProgress();
         showLoading(false);
         showScreen('success');
-        
-        // Animate response count
         animateCounter('responseCount', 247, 2000);
-        
+
     } catch (error) {
-        console.error('Submission error:', error);
+        console.error('[Survey] Fetch failed:', error.name, '-', error.message);
         showLoading(false);
-        
-        // Even on error, show success (since no-cors prevents error detection)
-        clearProgress();
-        showScreen('success');
-        animateCounter('responseCount', 247, 2000);
+        showToast(`Submission failed: ${error.message}`);
     }
 }
 

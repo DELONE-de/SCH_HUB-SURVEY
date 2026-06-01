@@ -8,7 +8,7 @@
 // Configuration
 const CONFIG = {
   SHEET_NAME: 'Survey Responses',
-  SHEET_ID: '1Apu_iMEOiydkcdKUjUSkF4pbJXLVXE0lCVX_SjpgQU'
+  SHEET_ID: '1Apu_iMEOiydkcdKUjUSkF4pb-JXLVXE0lCVX_SjpgQU'
 };
 
 /**
@@ -16,31 +16,49 @@ const CONFIG = {
  */
 function doPost(e) {
   try {
-    // Parse incoming JSON data
-    const data = JSON.parse(e.postData.contents);
-    
-    // Save to Google Sheets
+    Logger.log('doPost triggered');
+    if (!e) throw new Error('No event object received');
+    Logger.log('e.parameter: ' + JSON.stringify(e.parameter));
+    Logger.log('e.postData: ' + (e.postData ? e.postData.contents : 'null'));
+
+    let data;
+    if (e.parameter && e.parameter.data) {
+      Logger.log('Parsing from e.parameter.data');
+      data = JSON.parse(e.parameter.data);
+    } else if (e.postData && e.postData.contents) {
+      Logger.log('Parsing from e.postData.contents');
+      data = JSON.parse(e.postData.contents);
+    } else {
+      throw new Error('No data received. e.parameter: ' + JSON.stringify(e.parameter));
+    }
+
+    Logger.log('Parsed data keys: ' + Object.keys(data).join(', '));
     saveToSheet(data);
-    
-    // Return success response
+    Logger.log('Saved to sheet successfully');
+
     return ContentService
-      .createTextOutput(JSON.stringify({
-        success: true,
-        message: 'Survey submitted successfully',
-        timestamp: new Date().toISOString()
-      }))
+      .createTextOutput(JSON.stringify({ success: true, timestamp: new Date().toISOString() }))
       .setMimeType(ContentService.MimeType.JSON);
-      
+
   } catch (error) {
-    Logger.log('Error: ' + error.toString());
-    
+    Logger.log('ERROR in doPost: ' + error.toString());
+    Logger.log('Stack: ' + error.stack);
     return ContentService
-      .createTextOutput(JSON.stringify({
-        success: false,
-        error: error.toString()
-      }))
+      .createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+/**
+ * Handle OPTIONS preflight
+ */
+function doOptions(e) {
+  return ContentService
+    .createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
 /**
@@ -219,4 +237,26 @@ function createHeaders(sheet) {
 function getResponseCount() {
   const sheet = getOrCreateSheet();
   return Math.max(0, sheet.getLastRow() - 1); // Subtract header row
+}
+
+/**
+ * Test doPost locally from the Apps Script editor
+ */
+function testDoPost() {
+  const mockEvent = {
+    postData: {
+      contents: JSON.stringify({
+        level: '100',
+        faculty: 'Engineering',
+        department: 'Computer Science',
+        accommodation: 'On-campus',
+        primaryDevice: 'Mobile',
+        appUsageFrequency: 'Daily',
+        academicChallenges: ['Scheduling', 'Notifications'],
+        missedUpdatesFrequency: 'Often'
+      })
+    }
+  };
+  const result = doPost(mockEvent);
+  Logger.log(result.getContent());
 }
